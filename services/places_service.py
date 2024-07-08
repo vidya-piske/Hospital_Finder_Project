@@ -19,8 +19,6 @@ def get_hospitals_by_place(place_name):
     # Fetch latitude and longitude from Google Geocoding API based on place name
     url = f"https://maps.googleapis.com/maps/api/geocode/json?address={place_name}&key={GOOGLE_API_KEY}"
     response = requests.get(url)
-    print(response, "response_of_places")
-    print(place_name, "place_name")
     if response.status_code == 200:
         results = response.json().get('results', [])
         if results:
@@ -30,7 +28,6 @@ def get_hospitals_by_place(place_name):
             # Fetch hospitals near the retrieved latitude and longitude
             url = f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius=500&type=hospital&key={GOOGLE_API_KEY}"
             response = requests.get(url)
-            print(response, "response_2of_places")
             if response.status_code == 200:
                 hospitals = response.json().get('results', [])
                 if hospitals:
