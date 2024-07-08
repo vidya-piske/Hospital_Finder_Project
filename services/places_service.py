@@ -32,7 +32,8 @@ def get_hospitals_by_place(place_name):
                 hospitals = response.json().get('results', [])
                 if hospitals:
                     hospital_details = []
-                    for hospital in hospitals:
+                    # Limit the loop to 5 iterations
+                    for hospital in hospitals[:5]:
                         place_id = hospital.get('place_id')
                         details = get_hospital_details(place_id)
                         if details:

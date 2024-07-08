@@ -14,11 +14,11 @@ def get_property_details():
     data = request.get_json()
     location = data.get('location')
 
-    # Check if location is provided and in correct format
+    # Check if location is provided and in the correct format
     if not location or ',' not in location:
         return jsonify({"error": "Invalid location format. Please provide latitude and longitude separated by comma."}), 400
 
-    # Get the Google API key from environment variables
+    # Get the API keys from environment variables
     google_api_key = os.getenv('GOOGLE_API_KEY')
     open_api_key = os.getenv('OPENAI_API_KEY')
 
@@ -34,7 +34,7 @@ def get_property_details():
     # Make the request to the Google Places API
     response = requests.get(url)
 
-    # Check if request was successful
+    # Check if the request was successful
     if response.status_code != 200:
         return jsonify({"error": "Failed to fetch data from Google API"}), response.status_code
 
@@ -47,8 +47,8 @@ def get_property_details():
     # Initialize a list to hold detailed information about each hospital
     hospital_details = []
 
-    # For each hospital, fetch detailed information using the place ID
-    for place in places:
+    # Fetch details for up to 5 hospitals
+    for place in places[:5]:
         place_id = place.get('place_id')
         detail_url = f"https://maps.googleapis.com/maps/api/place/details/json?place_id={place_id}&fields=name,formatted_address,formatted_phone_number,website,rating,reviews&key={google_api_key}"
         detail_response = requests.get(detail_url)
@@ -60,11 +60,10 @@ def get_property_details():
         else:
             print(f"Failed to fetch details for place_id {place_id}: {detail_response.status_code}")
 
-    # Sort hospitals by rating and return the top 5
-    hospital_details = sorted(hospital_details, key=lambda x: x.get('rating', 0), reverse=True)[:5]
+    # Sort hospitals by rating and return the top 5 (redundant since we're already limiting to 5)
+    hospital_details = sorted(hospital_details, key=lambda x: x.get('rating', 0), reverse=True)
 
     # Summarize the hospital details using OpenAI
     summary = summarize_hospitals(open_api_key, hospital_details)
 
     return jsonify({"hospital_details": hospital_details, "summary": summary})
-
